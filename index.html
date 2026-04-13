@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBC IT Solutions — Live Database Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fafaf8;--surface:#fff;--surface2:#f3f3f0;--border:#e2e0db;
+  --text:#1a1a18;--text2:#5c5b57;--text3:#8a8985;
+  --accent:#2563eb;--accent-bg:#eff5ff;
+  --green:#16a34a;--green-bg:#ecfdf5;
+  --amber:#d97706;--amber-bg:#fffbeb;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1117;--surface:#181b24;--surface2:#1e2230;--border:#2a2e3d;
+    --text:#e2e4ea;--text2:#8b90a0;--text3:#5c5f6e;
+    --accent:#5b8af5;--accent-bg:rgba(91,138,245,.1);
+    --green:#4ade80;--green-bg:rgba(74,222,128,.1);
+    --amber:#f5a85b;--amber-bg:rgba(245,168,91,.1);
+    --red:#f87171;--red-bg:rgba(248,113,113,.1);
+  }
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;font-size:15px}
+
+header{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+header h1{font-size:18px;font-weight:700}
+header h1 span{color:var(--accent);font-weight:600}
+.status{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text2)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+main{max-width:1200px;margin:0 auto;padding:24px}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:16px;
+}
+.stat-card .label{font-size:12px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.stat-card .value{font-size:28px;font-weight:700;margin-top:4px;font-family:var(--mono)}
+.stat-card .sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+.tabs{
+  display:flex;gap:2px;background:var(--surface2);border-radius:10px;padding:3px;
+  margin-bottom:20px;overflow-x:auto;
+}
+.tab{
+  padding:8px 16px;border-radius:8px;border:none;background:none;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.tab:hover{color:var(--text)}
+.tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+
+.table-section{display:none}
+.table-section.active{display:block}
+
+.data-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;
+}
+.data-card .card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);
+}
+.data-card .card-title{font-size:14px;font-weight:600;font-family:var(--mono)}
+.data-card .record-count{
+  font-size:11px;font-family:var(--mono);padding:3px 10px;
+  background:var(--accent-bg);color:var(--accent);border-radius:20px;
+}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  text-align:left;padding:10px 16px;font-family:var(--mono);font-size:11px;
+  font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;
+  background:var(--surface2);border-bottom:1px solid var(--border);
+  position:sticky;top:0;white-space:nowrap;
+}
+td{
+  padding:10px 16px;border-bottom:1px solid var(--border);
+  white-space:nowrap;color:var(--text2);
+}
+tr:hover td{background:var(--accent-bg)}
+td:first-child{color:var(--text);font-weight:500;font-family:var(--mono)}
+
+.loading{
+  display:flex;align-items:center;justify-content:center;
+  padding:60px;color:var(--text3);font-family:var(--mono);font-size:13px;
+}
+.loading .spinner{
+  width:20px;height:20px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .6s linear infinite;margin-right:10px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.error{
+  padding:20px;text-align:center;color:var(--red);
+  font-family:var(--mono);font-size:13px;
+}
+
+.search-bar{
+  margin-bottom:16px;display:flex;gap:8px;
+}
+.search-bar input{
+  flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
+  background:var(--surface);color:var(--text);font-family:var(--font);font-size:14px;
+}
+.search-bar input:focus{outline:none;border-color:var(--accent)}
+.search-bar input::placeholder{color:var(--text3)}
+
+.refresh-btn{
+  padding:8px 16px;border:1px solid var(--border);border-radius:8px;
+  background:var(--surface);color:var(--text2);font-family:var(--mono);
+  font-size:12px;cursor:pointer;transition:all .2s;
+}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+footer{
+  text-align:center;padding:32px;color:var(--text3);
+  font-size:12px;font-family:var(--mono);
+}
+
+@media(max-width:640px){
+  main{padding:12px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  header{padding:12px 16px}
+  header h1{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>IBC IT Solutions <span>Dashboard</span></h1>
+  <div class="status"><div class="status-dot" id="statusDot"></div><span id="statusText">Connecting...</span></div>
+</header>
+
+<main>
+  <div class="stats" id="statsGrid"></div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search across all columns..." oninput="filterTable()">
+    <button class="refresh-btn" onclick="loadAllData()">Refresh</button>
+  </div>
+
+  <div class="tabs" id="tabBar"></div>
+
+  <div id="sections"></div>
+</main>
+
+<footer>
+  IBC IT Solutions Database Dashboard &mdash; Connected to Oracle ORDS REST API<br>
+  Base URL: https://oracleapex.com/ords/demo_ibcit/
+</footer>
+
+<script>
+const BASE = 'https://oracleapex.com/ords/demo_ibcit';
+
+const tables = [
+  { alias: 'employee', label: 'Employees', icon: '' },
+  { alias: 'department', label: 'Departments', icon: '' },
+  { alias: 'project', label: 'Projects', icon: '' },
+  { alias: 'developer', label: 'Developers', icon: '' },
+  { alias: 'administrativestaff', label: 'Admin Staff', icon: '' },
+  { alias: 'skill', label: 'Skills', icon: '' },
+  { alias: 'technologicaldevice', label: 'Devices', icon: '' },
+  { alias: 'location', label: 'Locations', icon: '' },
+  { alias: 'room', label: 'Rooms', icon: '' },
+  { alias: 'office', label: 'Offices', icon: '' },
+  { alias: 'lab', label: 'Labs', icon: '' },
+  { alias: 'meetingroom', label: 'Meeting Rooms', icon: '' },
+  { alias: 'trainingmeeting', label: 'Meetings', icon: '' },
+  { alias: 'employeeproject', label: 'Emp-Project', icon: '' },
+  { alias: 'employeeskill', label: 'Emp-Skill', icon: '' },
+  { alias: 'employeeprojectskill', label: 'Emp-Proj-Skill', icon: '' },
+  { alias: 'developerdevicetraining', label: 'Dev-Device', icon: '' },
+  { alias: 'marriage', label: 'Marriage', icon: '' },
+];
+
+const dataStore = {};
+let activeTab = 'employee';
+
+function buildTabs() {
+  const bar = document.getElementById('tabBar');
+  bar.innerHTML = tables.map(t =>
+    `<button class="tab ${t.alias === activeTab ? 'active' : ''}" onclick="switchTab('${t.alias}')">${t.label}</button>`
+  ).join('');
+}
+
+function buildSections() {
+  const container = document.getElementById('sections');
+  container.innerHTML = tables.map(t =>
+    `<div class="table-section ${t.alias === activeTab ? 'active' : ''}" id="section-${t.alias}">
+      <div class="data-card">
+        <div class="card-header">
+          <span class="card-title">${t.label}</span>
+          <span class="record-count" id="count-${t.alias}">loading...</span>
+        </div>
+        <div class="table-wrap" id="wrap-${t.alias}">
+          <div class="loading"><div class="spinner"></div>Fetching from Oracle...</div>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+function switchTab(alias) {
+  activeTab = alias;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.table-section').forEach(s => s.classList.remove('active'));
+  const tabBtns = document.querySelectorAll('.tab');
+  tabBtns.forEach(t => { if(t.textContent === tables.find(x=>x.alias===alias)?.label) t.classList.add('active') });
+  document.getElementById('section-' + alias)?.classList.add('active');
+  document.getElementById('searchInput').value = '';
+}
+
+async function fetchTable(alias) {
+  try {
+    const res = await fetch(`${BASE}/${alias}/`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = data.items || [];
+    dataStore[alias] = items;
+    renderTable(alias, items);
+    document.getElementById('count-' + alias).textContent = `${items.length} records`;
+    return items.length;
+  } catch (err) {
+    document.getElementById('wrap-' + alias).innerHTML =
+      `<div class="error">Could not load ${alias}: ${err.message}</div>`;
+    document.getElementById('count-' + alias).textContent = 'error';
+    return 0;
+  }
+}
+
+function renderTable(alias, items) {
+  const wrap = document.getElementById('wrap-' + alias);
+  if (!items || items.length === 0) {
+    wrap.innerHTML = '<div class="loading">No records found</div>';
+    return;
+  }
+
+  const cols = Object.keys(items[0]).filter(k => !k.startsWith('links'));
+
+  let html = '<table><thead><tr>';
+  cols.forEach(c => { html += `<th>${c.replace(/_/g,' ')}</th>`; });
+  html += '</tr></thead><tbody>';
+  items.forEach(row => {
+    html += '<tr>';
+    cols.forEach(c => {
+      let val = row[c];
+      if (val === null || val === undefined) val = '-';
+      else if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T/)) {
+        val = val.substring(0, 10);
+      }
+      html += `<td>${val}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function filterTable() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const items = dataStore[activeTab] || [];
+  if (!query) { renderTable(activeTab, items); return; }
+  const filtered = items.filter(row =>
+    Object.values(row).some(v => v !== null && String(v).toLowerCase().includes(query))
+  );
+  renderTable(activeTab, filtered);
+  document.getElementById('count-' + activeTab).textContent = `${filtered.length} / ${items.length}`;
+}
+
+function buildStats(counts) {
+  const grid = document.getElementById('statsGrid');
+  const totalRecords = Object.values(counts).reduce((a,b) => a+b, 0);
+  const stats = [
+    { label: 'Tables', value: Object.keys(counts).length, sub: 'REST enabled' },
+    { label: 'Total records', value: totalRecords, sub: 'across all tables' },
+    { label: 'Employees', value: counts.employee || 0, sub: 'developers + admin' },
+    { label: 'Projects', value: counts.project || 0, sub: 'active projects' },
+    { label: 'Skills', value: counts.skill || 0, sub: 'tracked skills' },
+    { label: 'Meetings', value: counts.trainingmeeting || 0, sub: 'scheduled' },
+  ];
+  grid.innerHTML = stats.map(s =>
+    `<div class="stat-card"><div class="label">${s.label}</div><div class="value">${s.value}</div><div class="sub">${s.sub}</div></div>`
+  ).join('');
+}
+
+async function loadAllData() {
+  document.getElementById('statusText').textContent = 'Loading...';
+  document.getElementById('statusDot').style.background = 'var(--amber)';
+
+  const counts = {};
+  for (const t of tables) {
+    counts[t.alias] = await fetchTable(t.alias);
+  }
+
+  buildStats(counts);
+  document.getElementById('statusText').textContent = 'Connected to Oracle ORDS';
+  document.getElementById('statusDot').style.background = 'var(--green)';
+}
+
+buildTabs();
+buildSections();
+loadAllData();
+</script>
+</body>
+</html>
