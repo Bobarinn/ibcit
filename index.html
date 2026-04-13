@@ -3,322 +3,443 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IBC IT Solutions — Live Database Dashboard</title>
+<title>IBC IT Solutions — Live Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#fafaf8;--surface:#fff;--surface2:#f3f3f0;--border:#e2e0db;
-  --text:#1a1a18;--text2:#5c5b57;--text3:#8a8985;
-  --accent:#2563eb;--accent-bg:#eff5ff;
-  --green:#16a34a;--green-bg:#ecfdf5;
-  --amber:#d97706;--amber-bg:#fffbeb;
-  --red:#dc2626;--red-bg:#fef2f2;
-  --font:'DM Sans',system-ui,sans-serif;
-  --mono:'IBM Plex Mono',monospace;
-}
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#0f1117;--surface:#181b24;--surface2:#1e2230;--border:#2a2e3d;
-    --text:#e2e4ea;--text2:#8b90a0;--text3:#5c5f6e;
-    --accent:#5b8af5;--accent-bg:rgba(91,138,245,.1);
-    --green:#4ade80;--green-bg:rgba(74,222,128,.1);
-    --amber:#f5a85b;--amber-bg:rgba(245,168,91,.1);
-    --red:#f87171;--red-bg:rgba(248,113,113,.1);
-  }
-}
+:root{--bg:#fafaf8;--surface:#fff;--surface2:#f3f3f0;--border:#e2e0db;--text:#1a1a18;--text2:#5c5b57;--text3:#8a8985;--accent:#2563eb;--accent-bg:#eff5ff;--green:#16a34a;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--red:#dc2626;--red-bg:#fef2f2;--purple:#7c3aed;--purple-bg:#f5f3ff;--font:'DM Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1117;--surface:#181b24;--surface2:#1e2230;--border:#2a2e3d;--text:#e2e4ea;--text2:#8b90a0;--text3:#5c5f6e;--accent:#5b8af5;--accent-bg:rgba(91,138,245,.1);--green:#4ade80;--green-bg:rgba(74,222,128,.1);--amber:#f5a85b;--amber-bg:rgba(245,168,91,.1);--red:#f87171;--red-bg:rgba(248,113,113,.1);--purple:#a78bfa;--purple-bg:rgba(167,139,250,.1)}}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;font-size:15px}
-
-header{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:16px 24px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;
-}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 header h1{font-size:18px;font-weight:700}
 header h1 span{color:var(--accent);font-weight:600}
 .status{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--text2)}
 .status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
 main{max-width:1200px;margin:0 auto;padding:24px}
-
+.mode-switch{display:flex;gap:2px;background:var(--surface2);border-radius:10px;padding:3px;margin-bottom:20px}
+.mode-btn{flex:1;padding:10px 20px;border-radius:8px;border:none;background:none;font-family:var(--font);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .2s;text-align:center}
+.mode-btn:hover{color:var(--text)}
+.mode-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.mode-panel{display:none}.mode-panel.active{display:block}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
 @media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:10px;
-  padding:16px;
-}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
 .stat-card .label{font-size:12px;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
 .stat-card .value{font-size:28px;font-weight:700;margin-top:4px;font-family:var(--mono)}
 .stat-card .sub{font-size:11px;color:var(--text3);margin-top:2px}
-
-.tabs{
-  display:flex;gap:2px;background:var(--surface2);border-radius:10px;padding:3px;
-  margin-bottom:20px;overflow-x:auto;
-}
-.tab{
-  padding:8px 16px;border-radius:8px;border:none;background:none;
-  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);
-  cursor:pointer;white-space:nowrap;transition:all .2s;
-}
+.tabs{display:flex;gap:2px;background:var(--surface2);border-radius:10px;padding:3px;margin-bottom:20px;overflow-x:auto}
+.tab{padding:8px 16px;border-radius:8px;border:none;background:none;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .2s}
 .tab:hover{color:var(--text)}
 .tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.06)}
-
-.table-section{display:none}
-.table-section.active{display:block}
-
-.data-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  overflow:hidden;
-}
-.data-card .card-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 18px;border-bottom:1px solid var(--border);
-}
+.table-section{display:none}.table-section.active{display:block}
+.data-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.data-card .card-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
 .data-card .card-title{font-size:14px;font-weight:600;font-family:var(--mono)}
-.data-card .record-count{
-  font-size:11px;font-family:var(--mono);padding:3px 10px;
-  background:var(--accent-bg);color:var(--accent);border-radius:20px;
-}
-.table-wrap{overflow-x:auto}
+.data-card .record-count{font-size:11px;font-family:var(--mono);padding:3px 10px;background:var(--accent-bg);color:var(--accent);border-radius:20px}
+.table-wrap{overflow-x:auto;max-height:500px;overflow-y:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{
-  text-align:left;padding:10px 16px;font-family:var(--mono);font-size:11px;
-  font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;
-  background:var(--surface2);border-bottom:1px solid var(--border);
-  position:sticky;top:0;white-space:nowrap;
-}
-td{
-  padding:10px 16px;border-bottom:1px solid var(--border);
-  white-space:nowrap;color:var(--text2);
-}
+th{text-align:left;padding:10px 16px;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;background:var(--surface2);border-bottom:1px solid var(--border);position:sticky;top:0;white-space:nowrap;z-index:2}
+td{padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text2)}
 tr:hover td{background:var(--accent-bg)}
 td:first-child{color:var(--text);font-weight:500;font-family:var(--mono)}
-
-.loading{
-  display:flex;align-items:center;justify-content:center;
-  padding:60px;color:var(--text3);font-family:var(--mono);font-size:13px;
-}
-.loading .spinner{
-  width:20px;height:20px;border:2px solid var(--border);
-  border-top-color:var(--accent);border-radius:50%;
-  animation:spin .6s linear infinite;margin-right:10px;
-}
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;color:var(--text3);font-family:var(--mono);font-size:13px}
+.loading .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-.error{
-  padding:20px;text-align:center;color:var(--red);
-  font-family:var(--mono);font-size:13px;
-}
-
-.search-bar{
-  margin-bottom:16px;display:flex;gap:8px;
-}
-.search-bar input{
-  flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;
-  background:var(--surface);color:var(--text);font-family:var(--font);font-size:14px;
-}
+.error{padding:20px;text-align:center;color:var(--red);font-family:var(--mono);font-size:13px}
+.search-bar{margin-bottom:16px;display:flex;gap:8px}
+.search-bar input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:14px}
 .search-bar input:focus{outline:none;border-color:var(--accent)}
 .search-bar input::placeholder{color:var(--text3)}
-
-.refresh-btn{
-  padding:8px 16px;border:1px solid var(--border);border-radius:8px;
-  background:var(--surface);color:var(--text2);font-family:var(--mono);
-  font-size:12px;cursor:pointer;transition:all .2s;
-}
+.refresh-btn{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;transition:all .2s}
 .refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
-
-footer{
-  text-align:center;padding:32px;color:var(--text3);
-  font-size:12px;font-family:var(--mono);
-}
-
-@media(max-width:640px){
-  main{padding:12px}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  header{padding:12px 16px}
-  header h1{font-size:15px}
-}
+.query-nav{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.query-dots{display:flex;gap:6px;flex:1;justify-content:center}
+.query-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:none;cursor:pointer;transition:all .2s;padding:0}
+.query-dot.active{background:var(--accent);border-color:var(--accent)}
+.query-dot:hover{border-color:var(--accent)}
+.nav-arrow{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.nav-arrow:hover{border-color:var(--accent);color:var(--accent)}
+.query-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:none}
+.query-card.active{display:block}
+.query-card-top{padding:20px;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-start}
+.query-number{width:40px;height:40px;border-radius:10px;background:var(--purple-bg);color:var(--purple);font-family:var(--mono);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.query-info{flex:1}
+.query-info h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.query-info p{font-size:13px;color:var(--text2);line-height:1.5}
+.sql-container{margin-top:12px;position:relative;display:none}
+.sql-container.show{display:block}
+.query-sql{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;padding-right:50px;font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.6;overflow-x:auto;white-space:pre;margin:0}
+.copy-sql{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:14px}
+.copy-sql:hover{border-color:var(--accent);color:var(--accent)}
+.copy-sql.copied{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.toggle-sql{padding:6px 14px;border:1px solid var(--border);border-radius:6px;background:none;color:var(--text3);font-family:var(--mono);font-size:11px;cursor:pointer;transition:all .2s}
+.toggle-sql:hover{color:var(--accent);border-color:var(--accent)}
+.run-query{padding:6px 16px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-family:var(--mono);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.run-query:hover{opacity:.85}
+.run-all{padding:8px 20px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:16px}
+.run-all:hover{background:var(--accent);color:#fff}
+.query-results{padding:0}
+.query-results .table-wrap{max-height:400px}
+.result-status{padding:14px 20px;font-family:var(--mono);font-size:12px;color:var(--green);background:var(--green-bg);display:flex;align-items:center;gap:8px}
+.result-status.pending{color:var(--text3);background:var(--surface2)}
+footer{text-align:center;padding:32px;color:var(--text3);font-size:12px;font-family:var(--mono)}
+@media(max-width:640px){main{padding:12px}.stats{grid-template-columns:repeat(2,1fr)}header{padding:12px 16px}header h1{font-size:15px}.query-card-top{flex-direction:column;gap:10px}}
 </style>
 </head>
 <body>
-
 <header>
   <h1>IBC IT Solutions <span>Dashboard</span></h1>
   <div class="status"><div class="status-dot" id="statusDot"></div><span id="statusText">Connecting...</span></div>
 </header>
-
 <main>
   <div class="stats" id="statsGrid"></div>
-
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search across all columns..." oninput="filterTable()">
-    <button class="refresh-btn" onclick="loadAllData()">Refresh</button>
+  <div class="mode-switch">
+    <button class="mode-btn active" onclick="switchMode(this,'tables')">Data Explorer</button>
+    <button class="mode-btn" onclick="switchMode(this,'queries')">Query Showcase</button>
   </div>
-
-  <div class="tabs" id="tabBar"></div>
-
-  <div id="sections"></div>
+  <div class="mode-panel active" id="panel-tables">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search across all columns..." oninput="filterTable()">
+      <button class="refresh-btn" onclick="loadAllData()">Refresh</button>
+    </div>
+    <div class="tabs" id="tabBar"></div>
+    <div id="sections"></div>
+  </div>
+  <div class="mode-panel" id="panel-queries">
+    <button class="run-all" onclick="runAllQueries()">Run all 7 queries</button>
+    <div class="query-nav">
+      <button class="nav-arrow" onclick="prevQuery()">&#8592;</button>
+      <div class="query-dots" id="queryDots"></div>
+      <button class="nav-arrow" onclick="nextQuery()">&#8594;</button>
+    </div>
+    <div id="queryCards"></div>
+  </div>
 </main>
-
-<footer>
-  IBC IT Solutions Database Dashboard &mdash; Connected to Oracle ORDS REST API<br>
-  Base URL: https://oracleapex.com/ords/demo_ibcit/
-</footer>
+<footer>IBC IT Solutions Database Dashboard &mdash; Connected to Oracle ORDS REST API</footer>
 
 <script>
 const BASE = 'https://oracleapex.com/ords/demo_ibcit';
-
 const tables = [
-  { alias: 'employee', label: 'Employees', icon: '' },
-  { alias: 'department', label: 'Departments', icon: '' },
-  { alias: 'project', label: 'Projects', icon: '' },
-  { alias: 'developer', label: 'Developers', icon: '' },
-  { alias: 'administrativestaff', label: 'Admin Staff', icon: '' },
-  { alias: 'skill', label: 'Skills', icon: '' },
-  { alias: 'technologicaldevice', label: 'Devices', icon: '' },
-  { alias: 'location', label: 'Locations', icon: '' },
-  { alias: 'room', label: 'Rooms', icon: '' },
-  { alias: 'office', label: 'Offices', icon: '' },
-  { alias: 'lab', label: 'Labs', icon: '' },
-  { alias: 'meetingroom', label: 'Meeting Rooms', icon: '' },
-  { alias: 'trainingmeeting', label: 'Meetings', icon: '' },
-  { alias: 'employeeproject', label: 'Emp-Project', icon: '' },
-  { alias: 'employeeskill', label: 'Emp-Skill', icon: '' },
-  { alias: 'employeeprojectskill', label: 'Emp-Proj-Skill', icon: '' },
-  { alias: 'developerdevicetraining', label: 'Dev-Device', icon: '' },
-  { alias: 'marriage', label: 'Marriage', icon: '' },
+  {alias:'employee',label:'Employees'},{alias:'department',label:'Departments'},
+  {alias:'project',label:'Projects'},{alias:'developer',label:'Developers'},
+  {alias:'administrativestaff',label:'Admin Staff'},{alias:'skill',label:'Skills'},
+  {alias:'technologicaldevice',label:'Devices'},{alias:'location',label:'Locations'},
+  {alias:'room',label:'Rooms'},{alias:'office',label:'Offices'},
+  {alias:'lab',label:'Labs'},{alias:'meetingroom',label:'Meeting Rooms'},
+  {alias:'trainingmeeting',label:'Meetings'},{alias:'employeeproject',label:'Emp-Project'},
+  {alias:'employeeskill',label:'Emp-Skill'},{alias:'employeeprojectskill',label:'Emp-Proj-Skill'},
+  {alias:'developerdevicetraining',label:'Dev-Device'},{alias:'marriage',label:'Marriage'},
 ];
-
 const dataStore = {};
 let activeTab = 'employee';
+let currentQuery = 0;
+
+// Case-insensitive field getter
+function g(obj, field) {
+  if (!obj) return null;
+  const lf = field.toLowerCase();
+  for (const k of Object.keys(obj)) {
+    if (k.toLowerCase() === lf) return obj[k];
+  }
+  return null;
+}
+
+async function fetchJSON(alias) {
+  if (dataStore[alias] && dataStore[alias].length > 0) return dataStore[alias];
+  try {
+    const res = await fetch(BASE + '/' + alias + '/', { headers:{'Accept':'application/json'} });
+    const data = await res.json();
+    dataStore[alias] = data.items || [];
+    return dataStore[alias];
+  } catch(e) { console.error('Fetch error:', alias, e); return []; }
+}
+
+function renderHTMLTable(items, wrapId) {
+  const wrap = document.getElementById(wrapId);
+  if (!items || items.length === 0) { wrap.innerHTML = '<div class="loading">No results returned</div>'; return; }
+  const cols = Object.keys(items[0]);
+  let h = '<table><thead><tr>';
+  cols.forEach(c => h += '<th>' + c + '</th>');
+  h += '</tr></thead><tbody>';
+  items.forEach(row => { h += '<tr>'; cols.forEach(c => { let v = row[c]; if(v===null||v===undefined) v='-'; h += '<td>'+v+'</td>'; }); h += '</tr>'; });
+  h += '</tbody></table>';
+  wrap.innerHTML = h;
+}
+
+// ==================== QUERIES ====================
+const queries = [
+  { num:1, title:'Employees on high-value projects',
+    desc:'List all employees assigned to projects with EstimatedCost over $50,000.',
+    sql:'SELECT DISTINCT e.EmployeeID, e.FirstName, e.LastName,\n       p.ProjectName, p.EstimatedCost\nFROM Employee e\nJOIN EmployeeProject ep ON e.EmployeeID = ep.EmployeeID\nJOIN Project p ON ep.ProjectID = p.ProjectID\nWHERE p.EstimatedCost > 50000\nORDER BY e.EmployeeID;',
+    run: async () => {
+      const [emps, eps, projs] = await Promise.all([fetchJSON('employee'), fetchJSON('employeeproject'), fetchJSON('project')]);
+      const bigP = projs.filter(p => Number(g(p,'estimatedcost')) > 50000);
+      const bigIds = new Set(bigP.map(p => g(p,'projectid')));
+      const seen = new Set();
+      const results = [];
+      eps.forEach(ep => {
+        const key = g(ep,'employeeid') + '-' + g(ep,'projectid');
+        if (seen.has(key) || !bigIds.has(g(ep,'projectid'))) return;
+        seen.add(key);
+        const e = emps.find(em => g(em,'employeeid') === g(ep,'employeeid'));
+        const p = bigP.find(pr => g(pr,'projectid') === g(ep,'projectid'));
+        if (e && p) results.push({ EmployeeID: g(e,'employeeid'), FirstName: g(e,'firstname'), LastName: g(e,'lastname'), ProjectName: g(p,'projectname'), EstimatedCost: '$'+Number(g(p,'estimatedcost')).toLocaleString() });
+      });
+      results.sort((a,b) => a.EmployeeID - b.EmployeeID);
+      return results;
+    }
+  },
+  { num:2, title:"Developers with Master's degree",
+    desc:'List EmployeeID and EmployeeFullName (LastName, FirstName) of developers with Master degree.',
+    sql:"SELECT e.EmployeeID,\n       e.LastName || ', ' || e.FirstName AS EmployeeFullName\nFROM Employee e\nJOIN Developer d ON e.EmployeeID = d.EmployeeID\nWHERE d.HighestEducationDegree = 'Master'\nORDER BY e.EmployeeID;",
+    run: async () => {
+      const [emps, devs] = await Promise.all([fetchJSON('employee'), fetchJSON('developer')]);
+      return devs.filter(d => String(g(d,'highesteducationdegree')).toLowerCase() === 'master')
+        .map(d => { const e = emps.find(em => g(em,'employeeid') === g(d,'employeeid')); return { EmployeeID: g(d,'employeeid'), EmployeeFullName: e ? g(e,'lastname')+', '+g(e,'firstname') : '-' }; })
+        .sort((a,b) => a.EmployeeID - b.EmployeeID);
+    }
+  },
+  { num:3, title:'Developers trained on 3+ devices',
+    desc:'List developers trained on more than 2 types of technological devices, with count.',
+    sql:'SELECT ddt.EmployeeID,\n       COUNT(ddt.DeviceID) AS DeviceTypeCount\nFROM DeveloperDeviceTraining ddt\nGROUP BY ddt.EmployeeID\nHAVING COUNT(ddt.DeviceID) > 2\nORDER BY DeviceTypeCount DESC;',
+    run: async () => {
+      const [ddt, emps] = await Promise.all([fetchJSON('developerdevicetraining'), fetchJSON('employee')]);
+      const counts = {};
+      ddt.forEach(r => { const eid = g(r,'employeeid'); counts[eid] = (counts[eid]||0) + 1; });
+      return Object.entries(counts).filter(([,c]) => c > 2)
+        .map(([id, cnt]) => { const e = emps.find(em => g(em,'employeeid') == id); return { EmployeeID: Number(id), Name: e ? g(e,'firstname')+' '+g(e,'lastname') : '-', DeviceTypeCount: cnt }; })
+        .sort((a,b) => b.DeviceTypeCount - a.DeviceTypeCount);
+    }
+  },
+  { num:4, title:'Meeting count for R&D Dept B',
+    desc:'Count total meetings scheduled for projects hosted by "Research and Development Department B".',
+    sql:"SELECT COUNT(tm.MeetingID) AS TotalMeetings\nFROM TrainingMeeting tm\nJOIN Project p ON tm.ProjectID = p.ProjectID\nJOIN Department d ON p.DepartmentCode = d.DepartmentCode\nWHERE d.DepartmentName = 'Research and Development Department B';",
+    run: async () => {
+      const [tm, projs, depts] = await Promise.all([fetchJSON('trainingmeeting'), fetchJSON('project'), fetchJSON('department')]);
+      const rdb = depts.find(d => String(g(d,'departmentname')).includes('Research and Development Department B'));
+      if (!rdb) return [{ TotalMeetings: 0, Note: 'Department not found' }];
+      const rdbCode = g(rdb,'departmentcode');
+      const rdbProjs = new Set(projs.filter(p => g(p,'departmentcode') === rdbCode).map(p => g(p,'projectid')));
+      const count = tm.filter(m => rdbProjs.has(g(m,'projectid'))).length;
+      return [{ TotalMeetings: count }];
+    }
+  },
+  { num:5, title:'Jeff Thomas Q1 2022 meetings',
+    desc:'List all meeting schedules attended by developer "Jeff Thomas" in Q1 2022.',
+    sql:"SELECT tm.MeetingID, tm.MeetingDate, tm.StartTime, tm.EndTime,\n       p.ProjectName\nFROM TrainingMeeting tm\nJOIN Project p ON tm.ProjectID = p.ProjectID\nJOIN EmployeeProject ep ON p.ProjectID = ep.ProjectID\nJOIN Employee e ON ep.EmployeeID = e.EmployeeID\nWHERE e.FirstName = 'Jeff' AND e.LastName = 'Thomas'\n  AND tm.MeetingDate >= TO_DATE('2022-01-01','YYYY-MM-DD')\n  AND tm.MeetingDate <= TO_DATE('2022-03-31','YYYY-MM-DD')\nORDER BY tm.MeetingDate;",
+    run: async () => {
+      const [tm, projs, eps, emps] = await Promise.all([fetchJSON('trainingmeeting'), fetchJSON('project'), fetchJSON('employeeproject'), fetchJSON('employee')]);
+      const jeff = emps.find(e => String(g(e,'firstname')).toLowerCase()==='jeff' && String(g(e,'lastname')).toLowerCase()==='thomas');
+      if (!jeff) return [{ Note: 'Jeff Thomas not found in Employee table' }];
+      const jeffId = g(jeff,'employeeid');
+      const jeffProjIds = new Set(eps.filter(ep => g(ep,'employeeid') == jeffId).map(ep => g(ep,'projectid')));
+      return tm.filter(m => {
+        const dateStr = String(g(m,'meetingdate')||'');
+        const d = new Date(dateStr);
+        return jeffProjIds.has(g(m,'projectid')) && d >= new Date('2022-01-01') && d <= new Date('2022-03-31');
+      }).map(m => {
+        const p = projs.find(pr => g(pr,'projectid') === g(m,'projectid'));
+        return { MeetingID: g(m,'meetingid'), MeetingDate: String(g(m,'meetingdate')||'').substring(0,10), StartTime: String(g(m,'starttime')||'').substring(11,16), EndTime: String(g(m,'endtime')||'').substring(11,16), ProjectName: p ? g(p,'projectname') : '-' };
+      }).sort((a,b) => a.MeetingDate.localeCompare(b.MeetingDate));
+    }
+  },
+  { num:6, title:'All employees and their skills',
+    desc:'List all employees and their skills.',
+    sql:'SELECT e.EmployeeID, e.FirstName, e.LastName, s.SkillDescription\nFROM Employee e\nJOIN EmployeeSkill es ON e.EmployeeID = es.EmployeeID\nJOIN Skill s ON es.SkillID = s.SkillID\nORDER BY e.EmployeeID, s.SkillDescription;',
+    run: async () => {
+      const [emps, es, skills] = await Promise.all([fetchJSON('employee'), fetchJSON('employeeskill'), fetchJSON('skill')]);
+      return es.map(r => {
+        const e = emps.find(em => g(em,'employeeid') == g(r,'employeeid'));
+        const s = skills.find(sk => g(sk,'skillid') == g(r,'skillid'));
+        return { EmployeeID: g(r,'employeeid'), FirstName: e ? g(e,'firstname') : '-', LastName: e ? g(e,'lastname') : '-', Skill: s ? g(s,'skilldescription') : '-' };
+      }).sort((a,b) => a.EmployeeID - b.EmployeeID || String(a.Skill).localeCompare(String(b.Skill)));
+    }
+  },
+  { num:7, title:'Penetration Testing on 2+ projects (2022)',
+    desc:'List employees who use "Penetration Testing" on more than one project in 2022.',
+    sql:"SELECT e.EmployeeID, e.FirstName, e.LastName,\n       COUNT(eps.ProjectID) AS ProjectCount\nFROM Employee e\nJOIN EmployeeProjectSkill eps ON e.EmployeeID = eps.EmployeeID\nJOIN Skill s ON eps.SkillID = s.SkillID\nJOIN Project p ON eps.ProjectID = p.ProjectID\nWHERE s.SkillDescription = 'Penetration Testing'\n  AND p.StartTime >= TO_DATE('2022-01-01','YYYY-MM-DD')\n  AND p.StartTime <= TO_DATE('2022-12-31','YYYY-MM-DD')\nGROUP BY e.EmployeeID, e.FirstName, e.LastName\nHAVING COUNT(eps.ProjectID) > 1\nORDER BY ProjectCount DESC;",
+    run: async () => {
+      const [emps, epsData, skills, projs] = await Promise.all([fetchJSON('employee'), fetchJSON('employeeprojectskill'), fetchJSON('skill'), fetchJSON('project')]);
+      const penTest = skills.find(s => String(g(s,'skilldescription')).toLowerCase() === 'penetration testing');
+      if (!penTest) return [{ Note: 'Penetration Testing skill not found' }];
+      const ptId = g(penTest,'skillid');
+      const projs2022 = new Set(projs.filter(p => { const d = new Date(String(g(p,'starttime')||'')); return d.getFullYear() === 2022; }).map(p => g(p,'projectid')));
+      const relevant = epsData.filter(r => g(r,'skillid') == ptId && projs2022.has(g(r,'projectid')));
+      const counts = {};
+      relevant.forEach(r => { const eid = g(r,'employeeid'); counts[eid] = (counts[eid]||0) + 1; });
+      return Object.entries(counts).filter(([,c]) => c > 1)
+        .map(([id, cnt]) => { const e = emps.find(em => g(em,'employeeid') == id); return { EmployeeID: Number(id), FirstName: e ? g(e,'firstname') : '-', LastName: e ? g(e,'lastname') : '-', ProjectCount: cnt }; })
+        .sort((a,b) => b.ProjectCount - a.ProjectCount);
+    }
+  }
+];
+
+// ==================== UI BUILD ====================
+function switchMode(btn, mode) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+mode).classList.add('active');
+}
 
 function buildTabs() {
-  const bar = document.getElementById('tabBar');
-  bar.innerHTML = tables.map(t =>
-    `<button class="tab ${t.alias === activeTab ? 'active' : ''}" onclick="switchTab('${t.alias}')">${t.label}</button>`
+  document.getElementById('tabBar').innerHTML = tables.map(t =>
+    '<button class="tab '+(t.alias===activeTab?'active':'')+'" onclick="switchTab(\''+t.alias+'\')">'+t.label+'</button>'
   ).join('');
 }
-
 function buildSections() {
-  const container = document.getElementById('sections');
-  container.innerHTML = tables.map(t =>
-    `<div class="table-section ${t.alias === activeTab ? 'active' : ''}" id="section-${t.alias}">
-      <div class="data-card">
-        <div class="card-header">
-          <span class="card-title">${t.label}</span>
-          <span class="record-count" id="count-${t.alias}">loading...</span>
-        </div>
-        <div class="table-wrap" id="wrap-${t.alias}">
-          <div class="loading"><div class="spinner"></div>Fetching from Oracle...</div>
-        </div>
-      </div>
-    </div>`
+  document.getElementById('sections').innerHTML = tables.map(t =>
+    '<div class="table-section '+(t.alias===activeTab?'active':'')+'" id="section-'+t.alias+'"><div class="data-card"><div class="card-header"><span class="card-title">'+t.label+'</span><span class="record-count" id="count-'+t.alias+'">loading...</span></div><div class="table-wrap" id="wrap-'+t.alias+'"><div class="loading"><div class="spinner"></div>Fetching...</div></div></div></div>'
   ).join('');
 }
-
 function switchTab(alias) {
   activeTab = alias;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.table-section').forEach(s => s.classList.remove('active'));
-  const tabBtns = document.querySelectorAll('.tab');
-  tabBtns.forEach(t => { if(t.textContent === tables.find(x=>x.alias===alias)?.label) t.classList.add('active') });
-  document.getElementById('section-' + alias)?.classList.add('active');
-  document.getElementById('searchInput').value = '';
+  document.querySelectorAll('.tab').forEach(t => { if(t.textContent===tables.find(x=>x.alias===alias)?.label) t.classList.add('active'); });
+  document.getElementById('section-'+alias)?.classList.add('active');
+  document.getElementById('searchInput').value='';
 }
-
 async function fetchTable(alias) {
   try {
-    const res = await fetch(`${BASE}/${alias}/`, {
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const items = data.items || [];
+    const res = await fetch(BASE+'/'+alias+'/', {headers:{'Accept':'application/json'}});
+    const data = await res.json(); const items = data.items || [];
     dataStore[alias] = items;
-    renderTable(alias, items);
-    document.getElementById('count-' + alias).textContent = `${items.length} records`;
+    const wrap = document.getElementById('wrap-'+alias);
+    if (!items.length) { wrap.innerHTML='<div class="loading">No records</div>'; }
+    else {
+      const cols = Object.keys(items[0]).filter(k=>!k.startsWith('links'));
+      let h='<table><thead><tr>'; cols.forEach(c=>h+='<th>'+c.replace(/_/g,' ')+'</th>'); h+='</tr></thead><tbody>';
+      items.forEach(row=>{ h+='<tr>'; cols.forEach(c=>{ let v=row[c]; if(v===null||v===undefined)v='-'; else if(typeof v==='string'&&v.match(/^\d{4}-\d{2}-\d{2}T/))v=v.substring(0,10); h+='<td>'+v+'</td>'; }); h+='</tr>'; });
+      h+='</tbody></table>'; wrap.innerHTML=h;
+    }
+    document.getElementById('count-'+alias).textContent=items.length+' records';
     return items.length;
-  } catch (err) {
-    document.getElementById('wrap-' + alias).innerHTML =
-      `<div class="error">Could not load ${alias}: ${err.message}</div>`;
-    document.getElementById('count-' + alias).textContent = 'error';
-    return 0;
+  } catch(err) {
+    document.getElementById('wrap-'+alias).innerHTML='<div class="error">'+err.message+'</div>';
+    document.getElementById('count-'+alias).textContent='error'; return 0;
   }
 }
-
-function renderTable(alias, items) {
-  const wrap = document.getElementById('wrap-' + alias);
-  if (!items || items.length === 0) {
-    wrap.innerHTML = '<div class="loading">No records found</div>';
-    return;
-  }
-
-  const cols = Object.keys(items[0]).filter(k => !k.startsWith('links'));
-
-  let html = '<table><thead><tr>';
-  cols.forEach(c => { html += `<th>${c.replace(/_/g,' ')}</th>`; });
-  html += '</tr></thead><tbody>';
-  items.forEach(row => {
-    html += '<tr>';
-    cols.forEach(c => {
-      let val = row[c];
-      if (val === null || val === undefined) val = '-';
-      else if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}T/)) {
-        val = val.substring(0, 10);
-      }
-      html += `<td>${val}</td>`;
-    });
-    html += '</tr>';
-  });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
-}
-
 function filterTable() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
-  const items = dataStore[activeTab] || [];
-  if (!query) { renderTable(activeTab, items); return; }
-  const filtered = items.filter(row =>
-    Object.values(row).some(v => v !== null && String(v).toLowerCase().includes(query))
-  );
-  renderTable(activeTab, filtered);
-  document.getElementById('count-' + activeTab).textContent = `${filtered.length} / ${items.length}`;
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const items=dataStore[activeTab]||[];
+  if(!q){fetchTable(activeTab);return;}
+  const f=items.filter(row=>Object.values(row).some(v=>v!==null&&String(v).toLowerCase().includes(q)));
+  const wrap=document.getElementById('wrap-'+activeTab);
+  if(!f.length){wrap.innerHTML='<div class="loading">No matches</div>';}
+  else {
+    const cols=Object.keys(f[0]).filter(k=>!k.startsWith('links'));
+    let h='<table><thead><tr>'; cols.forEach(c=>h+='<th>'+c+'</th>'); h+='</tr></thead><tbody>';
+    f.forEach(row=>{h+='<tr>';cols.forEach(c=>{let v=row[c];if(v==null)v='-';h+='<td>'+v+'</td>';});h+='</tr>';});
+    h+='</tbody></table>';wrap.innerHTML=h;
+  }
+  document.getElementById('count-'+activeTab).textContent=f.length+' / '+items.length;
+}
+function buildStats(counts) {
+  const total=Object.values(counts).reduce((a,b)=>a+b,0);
+  document.getElementById('statsGrid').innerHTML=[
+    {l:'Tables',v:Object.keys(counts).length,s:'REST enabled'},
+    {l:'Total records',v:total,s:'across all tables'},
+    {l:'Employees',v:counts.employee||0,s:'developers + admin'},
+    {l:'Projects',v:counts.project||0,s:'active projects'},
+    {l:'Skills',v:counts.skill||0,s:'tracked skills'},
+    {l:'Meetings',v:counts.trainingmeeting||0,s:'scheduled'},
+  ].map(s=>'<div class="stat-card"><div class="label">'+s.l+'</div><div class="value">'+s.v+'</div><div class="sub">'+s.s+'</div></div>').join('');
 }
 
-function buildStats(counts) {
-  const grid = document.getElementById('statsGrid');
-  const totalRecords = Object.values(counts).reduce((a,b) => a+b, 0);
-  const stats = [
-    { label: 'Tables', value: Object.keys(counts).length, sub: 'REST enabled' },
-    { label: 'Total records', value: totalRecords, sub: 'across all tables' },
-    { label: 'Employees', value: counts.employee || 0, sub: 'developers + admin' },
-    { label: 'Projects', value: counts.project || 0, sub: 'active projects' },
-    { label: 'Skills', value: counts.skill || 0, sub: 'tracked skills' },
-    { label: 'Meetings', value: counts.trainingmeeting || 0, sub: 'scheduled' },
-  ];
-  grid.innerHTML = stats.map(s =>
-    `<div class="stat-card"><div class="label">${s.label}</div><div class="value">${s.value}</div><div class="sub">${s.sub}</div></div>`
+// ==================== QUERY UI ====================
+function buildQueryCards() {
+  document.getElementById('queryDots').innerHTML = queries.map((_,i) =>
+    '<button class="query-dot '+(i===0?'active':'')+'" onclick="goToQuery('+i+')"></button>'
+  ).join('');
+  document.getElementById('queryCards').innerHTML = queries.map((q,i) =>
+    '<div class="query-card '+(i===0?'active':'')+'" id="qcard-'+i+'">' +
+      '<div class="query-card-top"><div class="query-number">Q'+q.num+'</div><div class="query-info">' +
+        '<h3>'+q.title+'</h3><p>'+q.desc+'</p>' +
+        '<div class="btn-row"><button class="toggle-sql" onclick="toggleSQL('+i+')">Show SQL</button><button class="run-query" onclick="runQuery('+i+')">Run query</button></div>' +
+        '<div class="sql-container" id="sqlbox-'+i+'"><pre class="query-sql">'+q.sql+'</pre>' +
+        '<button class="copy-sql" onclick="copySQL('+i+')" title="Copy SQL"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></div>' +
+      '</div></div>' +
+      '<div class="result-status pending" id="qstatus-'+i+'">Click "Run query" to fetch live results</div>' +
+      '<div class="query-results"><div class="table-wrap" id="qresult-'+i+'"></div></div>' +
+    '</div>'
   ).join('');
 }
-
-async function loadAllData() {
-  document.getElementById('statusText').textContent = 'Loading...';
-  document.getElementById('statusDot').style.background = 'var(--amber)';
-
-  const counts = {};
-  for (const t of tables) {
-    counts[t.alias] = await fetchTable(t.alias);
-  }
-
-  buildStats(counts);
-  document.getElementById('statusText').textContent = 'Connected to Oracle ORDS';
-  document.getElementById('statusDot').style.background = 'var(--green)';
+function goToQuery(idx) {
+  currentQuery=idx;
+  document.querySelectorAll('.query-card').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.query-dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('qcard-'+idx).classList.add('active');
+  document.querySelectorAll('.query-dot')[idx]?.classList.add('active');
 }
+function prevQuery(){goToQuery((currentQuery-1+queries.length)%queries.length)}
+function nextQuery(){goToQuery((currentQuery+1)%queries.length)}
+function toggleSQL(idx){document.getElementById('sqlbox-'+idx).classList.toggle('show')}
+function copySQL(idx) {
+  const sql = queries[idx].sql;
+  const btn = document.querySelectorAll('.copy-sql')[idx];
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(sql).then(() => { showCopied(btn); }).catch(() => { fallbackCopy(sql, btn); });
+  } else { fallbackCopy(sql, btn); }
+}
+function fallbackCopy(text, btn) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showCopied(btn); } catch(e) {}
+  document.body.removeChild(ta);
+}
+function showCopied(btn) {
+  btn.classList.add('copied');
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+  }, 2000);
+}
+async function runQuery(idx) {
+  const status = document.getElementById('qstatus-'+idx);
+  status.className='result-status pending';
+  status.innerHTML='<div class="spinner" style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block;margin-right:8px"></div>Running...';
+  try {
+    dataStore['employee']=null;dataStore['developer']=null;dataStore['employeeskill']=null;
+    dataStore['employeeprojectskill']=null;dataStore['developerdevicetraining']=null;
+    dataStore['project']=null;dataStore['department']=null;dataStore['trainingmeeting']=null;
+    dataStore['employeeproject']=null;dataStore['skill']=null;
+    const results = await queries[idx].run();
+    status.className='result-status';
+    status.textContent = results.length+' row'+(results.length!==1?'s':'')+' returned';
+    renderHTMLTable(results, 'qresult-'+idx);
+  } catch(err) {
+    status.className='result-status'; status.style.color='var(--red)'; status.style.background='var(--red-bg)';
+    status.textContent='Error: '+err.message;
+  }
+}
+async function runAllQueries() {
+  for (let i = 0; i < queries.length; i++) {
+    await runQuery(i);
+  }
+  goToQuery(0);
+}
+document.addEventListener('keydown', e => {
+  if(document.getElementById('panel-queries').classList.contains('active')){
+    if(e.key==='ArrowLeft')prevQuery(); if(e.key==='ArrowRight')nextQuery();
+  }
+});
 
-buildTabs();
-buildSections();
-loadAllData();
+// ==================== INIT ====================
+async function loadAllData() {
+  document.getElementById('statusText').textContent='Loading...';
+  document.getElementById('statusDot').style.background='var(--amber)';
+  const counts={};
+  for(const t of tables) counts[t.alias]=await fetchTable(t.alias);
+  buildStats(counts);
+  document.getElementById('statusText').textContent='Connected to Oracle ORDS';
+  document.getElementById('statusDot').style.background='var(--green)';
+}
+buildTabs();buildSections();buildQueryCards();loadAllData();
 </script>
 </body>
 </html>
